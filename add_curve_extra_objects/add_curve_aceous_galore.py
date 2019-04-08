@@ -43,7 +43,7 @@ from bpy.props import (
 from mathutils import Matrix, Vector
 from bpy.types import Operator
 from math import (
-        sin, cos, pi
+        sin, cos, pi, sqrt
         )
 import mathutils.noise as Noise
 
@@ -591,6 +591,24 @@ def CycloidCurve(number=100, type=0, R=4.0, r=1.0, d=1.0):
             y = ((a + b) * sin(t * pi)) - (d * sin(((a + b) / b) * t * pi))
             z = 0
             newpoints.append([x, y, z])
+            i += 1
+    if type is 3:
+        # wankel Epitrochoid
+        while i < number:
+            t = i * step * pi
+            x = R * r/d * ((cos(t) - (d * cos(3 * t))))
+            y = R * r/d * ((sin(t) - (d * sin(3 * t))))
+            z = 0
+            newpoints.append([x,y,z])
+            i += 1
+    elif type is 4:
+        # wankel Epitrocoid envelope
+        while i < number:
+            t = i * step * pi
+            x = R * r/d * (cos(2*t) - (3*d**2*sin(6*t) * sin(2*t)) + (2*d*sqrt(1-9*(d*sin(3*t))**2)*cos(3*t)*cos(2*t)))
+            y = R * r/d * (sin(2*t) + (3*d**2*sin(6*t) * cos(2*t)) + (2*d*sqrt(1-9*(d*sin(3*t))**2)*cos(3*t)*sin(2*t)))
+            z = 0
+            newpoints.append([x,y,z])
             i += 1
     else:
         # Cycloid
@@ -1191,8 +1209,8 @@ class Curveaceous_galore(Operator, object_utils.AddObjectHelper):
             name="Type",
             default=1,
             min=0,
-            max=2,
-            description="Type: Cycloid , Hypocycloid / Hypotrochoid , Epicycloid / Epitrochoid"
+            max=4,
+            description="Type: Cycloid , Hypocycloid / Hypotrochoid , Epicycloid / Epitrochoid, Wankel Epicycloid, Wankel Epicycloid Envelope"
             )
     cyclo_a : FloatProperty(
             name="R",
